@@ -11,21 +11,87 @@
         <h1 class="text-2xl font-bold text-amber-900 mb-1">☕ Cafe Loyalty Card</h1>
         <p class="text-xs text-amber-700 mb-6">Collect 7 stamps to get 1 Free Cappuccino!</p>
         
-        <!-- Stamps Grid (7 Visits) -->
-        <div class="grid grid-cols-4 gap-3 mb-6">
-            <div class="h-14 w-14 rounded-full border-2 border-dashed border-amber-400 bg-amber-100 flex items-center justify-center text-xl font-bold text-amber-800">☕ 1</div>
-            <div class="h-14 w-14 rounded-full border-2 border-dashed border-amber-300 bg-amber-50 flex items-center justify-center text-xs text-amber-400">2</div>
-            <div class="h-14 w-14 rounded-full border-2 border-dashed border-amber-300 bg-amber-50 flex items-center justify-center text-xs text-amber-400">3</div>
-            <div class="h-14 w-14 rounded-full border-2 border-dashed border-amber-300 bg-amber-50 flex items-center justify-center text-xs text-amber-400">4</div>
-            <div class="h-14 w-14 rounded-full border-2 border-dashed border-amber-300 bg-amber-50 flex items-center justify-center text-xs text-amber-400">5</div>
-            <div class="h-14 w-14 rounded-full border-2 border-dashed border-amber-300 bg-amber-50 flex items-center justify-center text-xs text-amber-400">6</div>
-            <div class="h-14 w-14 rounded-full border-2 border-dashed border-amber-300 bg-amber-50 flex items-center justify-center text-xs text-amber-400">7</div>
-            <div class="h-14 w-14 rounded-full border-2 border-amber-500 bg-amber-500 text-white flex items-center justify-center text-xl shadow-md">🎁</div>
-        </div>
+        <!-- Stamps Grid -->
+        <div id="stamps-grid" class="grid grid-cols-4 gap-3 mb-6"></div>
 
-        <button class="w-full bg-amber-800 hover:bg-amber-900 text-white font-semibold py-3 rounded-xl transition-all shadow-lg">
+        <button onclick="openPinModal()" class="w-full bg-amber-800 hover:bg-amber-900 text-white font-semibold py-3 rounded-xl transition-all shadow-lg">
             Add Visit Stamp
         </button>
     </div>
+
+    <!-- PIN Modal -->
+    <div id="pin-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-xs text-center shadow-2xl">
+            <h3 class="text-lg font-bold text-amber-900 mb-2">Staff Verification</h3>
+            <p class="text-xs text-gray-500 mb-4">Enter Staff PIN to approve stamp</p>
+            
+            <input type="password" id="staff-pin" maxlength="4" placeholder="Enter PIN" class="w-full text-center text-xl font-bold border-2 border-amber-300 rounded-xl py-2 mb-4 focus:outline-none focus:border-amber-600">
+            
+            <div class="flex gap-2">
+                <button onclick="closePinModal()" class="w-1/2 bg-gray-200 text-gray-700 py-2 rounded-xl font-semibold">Cancel</button>
+                <button onclick="verifyPin()" class="w-1/2 bg-amber-800 text-white py-2 rounded-xl font-semibold">Verify</button>
+            </div>
+            <p id="error-msg" class="text-red-500 text-xs mt-2 hidden">Invalid PIN!</p>
+        </div>
+    </div>
+
+    <script>
+        let stampCount = parseInt(localStorage.getItem('cafe_stamps')) || 0;
+        const STAFF_PIN = "1234";
+
+        function renderStamps() {
+            const grid = document.getElementById('stamps-grid');
+            grid.innerHTML = '';
+            
+            for (let i = 1; i <= 7; i++) {
+                if (i <= stampCount) {
+                    grid.innerHTML += `<div class="h-14 w-14 rounded-full border-2 border-amber-600 bg-amber-100 flex items-center justify-center text-xl font-bold text-amber-900">☕ ${i}</div>`;
+                } else {
+                    grid.innerHTML += `<div class="h-14 w-14 rounded-full border-2 border-dashed border-amber-300 bg-amber-50 flex items-center justify-center text-xs text-amber-400">${i}</div>`;
+                }
+            }
+            
+            if (stampCount >= 7) {
+                grid.innerHTML += `<div onclick="claimReward()" class="h-14 w-14 rounded-full border-2 border-amber-500 bg-amber-500 text-white flex items-center justify-center text-xl shadow-md cursor-pointer animate-bounce">🎁</div>`;
+            } else {
+                grid.innerHTML += `<div class="h-14 w-14 rounded-full border-2 border-amber-300 bg-amber-100/50 text-amber-400 flex items-center justify-center text-xl opacity-50">🎁</div>`;
+            }
+        }
+
+        function openPinModal() {
+            document.getElementById('pin-modal').classList.remove('hidden');
+            document.getElementById('pin-modal').classList.add('flex');
+            document.getElementById('staff-pin').value = '';
+            document.getElementById('error-msg').classList.add('hidden');
+        }
+
+        function closePinModal() {
+            document.getElementById('pin-modal').classList.add('hidden');
+            document.getElementById('pin-modal').classList.remove('flex');
+        }
+
+        function verifyPin() {
+            const pinInput = document.getElementById('staff-pin').value;
+            if (pinInput === STAFF_PIN) {
+                if (stampCount < 7) {
+                    stampCount++;
+                    localStorage.setItem('cafe_stamps', stampCount);
+                    renderStamps();
+                }
+                closePinModal();
+            } else {
+                document.getElementById('error-msg').classList.remove('hidden');
+            }
+        }
+
+        function claimReward() {
+            alert("Free Cappuccino Claimed! Resetting stamps.");
+            stampCount = 0;
+            localStorage.setItem('cafe_stamps', stampCount);
+            renderStamps();
+        }
+
+        renderStamps();
+    </script>
 </body>
 </html>
