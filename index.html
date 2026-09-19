@@ -36,8 +36,14 @@
     </div>
 
     <script>
-        let stampCount = parseInt(localStorage.getItem('cafe_stamps')) || 0;
+        let stampCount = 0;
         const STAFF_PIN = "1234";
+
+        function loadStamps() {
+            const savedStamps = localStorage.getItem('cafe_stamps');
+            stampCount = savedStamps ? parseInt(savedStamps, 10) : 0;
+            renderStamps();
+        }
 
         function renderStamps() {
             const grid = document.getElementById('stamps-grid');
@@ -75,7 +81,7 @@
             if (pinInput === STAFF_PIN) {
                 if (stampCount < 7) {
                     stampCount++;
-                    localStorage.setItem('cafe_stamps', stampCount);
+                    localStorage.setItem('cafe_stamps', stampCount.toString());
                     renderStamps();
                 }
                 closePinModal();
@@ -87,11 +93,11 @@
         function claimReward() {
             alert("Free Cappuccino Claimed! Resetting stamps.");
             stampCount = 0;
-            localStorage.setItem('cafe_stamps', stampCount);
+            localStorage.setItem('cafe_stamps', '0');
             renderStamps();
         }
 
-        renderStamps();
+        document.addEventListener('DOMContentLoaded', loadStamps);
     </script>
 </body>
 </html>
