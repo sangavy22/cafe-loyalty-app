@@ -19,7 +19,7 @@
         </button>
     </div>
 
-    <!-- PIN Modal -->
+    <!-- PIN Modal Overlay -->
     <div id="pin-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl w-full max-w-xs text-center shadow-2xl">
             <h3 class="text-lg font-bold text-amber-900 mb-2">Staff Verification</h3>
@@ -36,14 +36,8 @@
     </div>
 
     <script>
-        let stampCount = 0;
+        let stampCount = parseInt(localStorage.getItem('cafe_stamps')) || 0;
         const STAFF_PIN = "1234";
-
-        function loadStamps() {
-            const savedStamps = localStorage.getItem('cafe_stamps');
-            stampCount = savedStamps ? parseInt(savedStamps, 10) : 0;
-            renderStamps();
-        }
 
         function renderStamps() {
             const grid = document.getElementById('stamps-grid');
@@ -83,6 +77,7 @@
                     stampCount++;
                     localStorage.setItem('cafe_stamps', stampCount.toString());
                     renderStamps();
+                    alert("Stamp #" + stampCount + " Added!");
                 }
                 closePinModal();
             } else {
@@ -97,7 +92,7 @@
             renderStamps();
         }
 
-        document.addEventListener('DOMContentLoaded', loadStamps);
+        renderStamps();
     </script>
 </body>
 </html>
